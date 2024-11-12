@@ -58,7 +58,7 @@ class DatabaseStorage(
     override fun onCreate(db: SQLiteDatabase) {
         // File exists but it is not a legacy database for some reason.
         this.isValidDatabaseFile = false
-        logger.error("Attempt to re-create existing legacy database file ${file.absolutePath}")
+        logger.error("Attempt to re-create existing legacy database file \\${file.absolutePath}")
     }
 
     override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
@@ -67,7 +67,7 @@ class DatabaseStorage(
 
     private fun queryDb(
         db: SQLiteDatabase,
-        table: String?,
+        table: String,
         columns: Array<String?>?,
         selection: String?,
         selectionArgs: Array<String?>?,
@@ -98,7 +98,7 @@ class DatabaseStorage(
         try {
             close()
         } catch (e: Exception) {
-            LogcatLogger.logger.error("close failed: ${e.message}")
+            LogcatLogger.logger.error("close failed: \\${e.message}")
         }
     }
 
@@ -153,12 +153,12 @@ class DatabaseStorage(
             }
         } catch (e: SQLiteException) {
             LogcatLogger.logger.error(
-                "read events from $table failed: ${e.message}"
+                "read events from \\${table} failed: \\${e.message}"
             )
             closeDb()
         } catch (e: StackOverflowError) {
             LogcatLogger.logger.error(
-                "read events from $table failed: ${e.message}"
+                "read events from \\${table} failed: \\${e.message}"
             )
             closeDb()
         } catch (e: IllegalStateException) { // put before Runtime since IllegalState extends
@@ -195,17 +195,17 @@ class DatabaseStorage(
             val db = writableDatabase
             db.delete(
                 table,
-                "${DatabaseConstants.ID_FIELD} = ?",
+                "\\${DatabaseConstants.ID_FIELD} = ?",
                 arrayOf(rowId.toString())
             )
         } catch (e: SQLiteException) {
             LogcatLogger.logger.error(
-                "remove events from $table failed: ${e.message}"
+                "remove events from \\${table} failed: \\${e.message}"
             )
             closeDb()
         } catch (e: StackOverflowError) {
             LogcatLogger.logger.error(
-                "remove events from $table failed: ${e.message}"
+                "remove events from \\${table} failed: \\${e.message}"
             )
             closeDb()
         } finally {
@@ -252,13 +252,13 @@ class DatabaseStorage(
             }
         } catch (e: SQLiteException) {
             LogcatLogger.logger.error(
-                "getValue from $table failed: ${e.message}"
+                "getValue from \\${table} failed: \\${e.message}"
             )
             // Hard to recover from SQLiteExceptions, just start fresh
             closeDb()
         } catch (e: StackOverflowError) {
             LogcatLogger.logger.error(
-                "getValue from $table failed: ${e.message}"
+                "getValue from \\${table} failed: \\${e.message}"
             )
             // potential stack overflow error when getting database on custom Android versions
             closeDb()
@@ -290,17 +290,17 @@ class DatabaseStorage(
             val db = writableDatabase
             db.delete(
                 table,
-                "${DatabaseConstants.KEY_FIELD} = ?",
+                "\\${DatabaseConstants.KEY_FIELD} = ?",
                 arrayOf(key)
             )
         } catch (e: SQLiteException) {
             LogcatLogger.logger.error(
-                "remove value from $table failed: ${e.message}"
+                "remove value from \\${table} failed: \\${e.message}"
             )
             closeDb()
         } catch (e: StackOverflowError) {
             LogcatLogger.logger.error(
-                "remove value from $table failed: ${e.message}"
+                "remove value from \\${table} failed: \\${e.message}"
             )
             closeDb()
         } finally {
@@ -329,6 +329,6 @@ object DatabaseStorageProvider {
 
     private fun getDatabaseName(instanceName: String?): String {
         val normalizedInstanceName = instanceName?.lowercase(Locale.getDefault())
-        return if (normalizedInstanceName.isNullOrEmpty() || normalizedInstanceName == Configuration.DEFAULT_INSTANCE) DatabaseConstants.DATABASE_NAME else "${DatabaseConstants.DATABASE_NAME}_$normalizedInstanceName"
+        return if (normalizedInstanceName.isNullOrEmpty() || normalizedInstanceName == Configuration.DEFAULT_INSTANCE) DatabaseConstants.DATABASE_NAME else "\\${DatabaseConstants.DATABASE_NAME}_\\${normalizedInstanceName}"
     }
 }
