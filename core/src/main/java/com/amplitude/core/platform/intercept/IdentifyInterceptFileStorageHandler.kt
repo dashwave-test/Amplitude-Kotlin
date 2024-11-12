@@ -16,6 +16,8 @@ class IdentifyInterceptFileStorageHandler(
     private val logger: Logger,
     private val amplitude: Amplitude
 ) : IdentifyInterceptStorageHandler {
+    private var sessionId: Long? = null
+
     override suspend fun getTransferIdentifyEvent(): BaseEvent? {
         try {
             storage.rollover()
@@ -61,6 +63,7 @@ class IdentifyInterceptFileStorageHandler(
             IdentifyOperation.SET.operationType,
             identifyEventUserProperties
         )
+        event?.sessionId = sessionId
         return event
     }
 
@@ -86,5 +89,9 @@ class IdentifyInterceptFileStorageHandler(
         amplitude.amplitudeScope.launch(amplitude.storageIODispatcher) {
             storage.removeFile(file)
         }
+    }
+
+    fun setSessionId(sessionId: Long) {
+        this.sessionId = sessionId
     }
 }
